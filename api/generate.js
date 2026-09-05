@@ -114,7 +114,7 @@ Adapte cette direction artistique au secteur donné (une écurie équestre n'a p
 
 ${ANTI_CLICHE}`;
 
-const DEVELOPER_SYSTEM = `Tu es un développeur front-end senior spécialisé en sites one-page ultra soignés (niveau Awwwards).
+const DEVELOPER_SYSTEM = `Tu es un développeur front-end senior spécialisé en sites one-page.
 On te donne un brief client (secteur, nom de marque) et une direction artistique déjà validée. Ton travail : écrire le code.
 
 Contraintes strictes :
@@ -123,7 +123,6 @@ Contraintes strictes :
 - Site one-page, responsive (mobile inclus), accessible (focus visible, contrastes corrects)
 - Respecte scrupuleusement la direction artistique fournie (couleurs, typographies, layout, principes)
 - Utilise du vrai contenu rédigé (titres, textes, labels) cohérent avec le secteur et la marque, jamais de texte placeholder
-- Une seule animation ou moment d'entrée soigné plutôt que des effets partout
 - N'ajoute jamais de bandeau cookies, de faux formulaire de paiement, ni de lien vers des pages qui n'existent pas
 
 ${ANTI_CLICHE}
@@ -178,14 +177,14 @@ module.exports = async function handler(req, res) {
     const artDirectionParts = [...imageParts, { text: briefText }];
     const artDirection = await callGemini(ART_DIRECTION_SYSTEM, artDirectionParts);
 
-    // 3. Agent développeur (texte seul)
+    // 3. Agent développeur (texte + images de référence)
     const devInput = `${briefText}\n\n--- DIRECTION ARTISTIQUE VALIDÉE ---\n${artDirection}`;
-    let code = await callGemini(DEVELOPER_SYSTEM, [{ text: devInput }]);
+    let code = await callGemini(DEVELOPER_SYSTEM, [...imageParts, { text: devInput }]);
     code = extractHTML(code);
 
-    // 4. Agent critique (relit et corrige si besoin)
+    // 4. Agent critique (texte + images de référence — relit et corrige si besoin)
     const critiqueInput = `--- DIRECTION ARTISTIQUE ---\n${artDirection}\n\n--- CODE À RELIRE ---\n${code}`;
-    let finalCode = await callGemini(CRITIQUE_SYSTEM, [{ text: critiqueInput }]);
+    let finalCode = await callGemini(CRITIQUE_SYSTEM, [...imageParts, { text: critiqueInput }]);
     finalCode = extractHTML(finalCode);
 
     res.status(200).json({ code: finalCode || code, imageCount: imageParts.length });
