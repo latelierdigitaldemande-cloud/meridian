@@ -97,16 +97,8 @@ function extractHTML(text) {
   return text.replace(/```html|```/g, "").trim();
 }
 
-// Liste anti-clichés IA, intégrée dans les prompts développeur et critique
-const ANTI_CLICHE = `Évite absolument les tics visuels typiques des sites générés par IA :
-- palette par défaut fond crème + texte serif + accent terracotta, ou fond noir + accent vert/violet néon générique
-- cartes toutes identiques avec la même ombre portée et les mêmes coins arrondis
-- sections systématiquement en 3 colonnes égales avec icône + titre + paragraphe
-- boutons "En savoir plus" / "Découvrir" avec flèche → répétés partout
-- structure prévisible hero -> 3 features -> témoignages -> CTA final, sans réflexion sur CE brief précis
-- Lorem ipsum ou texte placeholder générique
-- emojis utilisés comme icônes
-Le site doit avoir une identité visuelle pensée spécifiquement pour cette marque et ce secteur, pas un template générique habillé différemment.`;
+// Liste anti-clichés IA — vide pour l'instant, à remplir par le user avec ce qu'il veut exclure
+const ANTI_CLICHE = "";
 
 const ART_DIRECTION_SYSTEM = `Tu es un directeur artistique senior, niveau agence Awwwards, spécialisé dans un style "Luxe tech" : silence visuel, matières nobles (métal brossé, ivoire, bronze, ardoise), fond sombre ou très contrasté, grand calme dans la mise en page, typographie display sobre et précise, aucune agitation visuelle.
 
@@ -171,14 +163,21 @@ module.exports = async function handler(req, res) {
 
     // 1. Récupérer les images de référence Luxe tech depuis Supabase
     let imageParts = [];
+    let imageFetchError = null;
     try {
       const files = await listBucketFiles();
+      if (files.length === 0) {
+        imageFetchError = "Aucune image trouvée dans le bucket Supabase";
+      }
       const images = await Promise.all(files.map((f) => fetchImageAsBase64(f.name)));
       imageParts = images
         .filter(Boolean)
         .map((img) => ({ inlineData: { mimeType: img.mimeType, data: img.data } }));
+      if (imageParts.length === 0 && !imageFetchError) {
+        imageFetchError = "Les images n'ont pas pu être téléchargées (0 récupérées)";
+      }
     } catch (e) {
-      // Si Supabase échoue, on continue sans images plutôt que de tout bloquer
+      imageFetchError = e.message;
       imageParts = [];
     }
 
@@ -196,7 +195,7 @@ module.exports = async function handler(req, res) {
     let finalCode = await callGemini(CRITIQUE_SYSTEM, [{ text: critiqueInput }]);
     finalCode = extractHTML(finalCode);
 
-    res.status(200).json({ code: finalCode || code });
+    res.status(200).json({ code: finalCode || code, imageCount: imageParts.length, imageFetchError });
   } catch (err) {
     res.status(500).json({ error: err.message || "Erreur inconnue" });
   }
