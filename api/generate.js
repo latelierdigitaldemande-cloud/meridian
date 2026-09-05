@@ -9,7 +9,7 @@ const BUCKET = "meridian-images";
 // Modèle Gemini utilisé. Si ce modèle n'est plus disponible sur ton compte,
 // va sur aistudio.google.com -> Playground -> Get code pour voir un nom de modèle valide,
 // et remplace la valeur ci-dessous.
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3.6-flash";
 
 const MIME_BY_EXT = {
   png: "image/png",
