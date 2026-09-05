@@ -6,14 +6,15 @@
 <title>Meridian — générateur de sites</title>
 <style>
   :root{
-    --bg-deep:#0a0812;
-    --ink:#f4f1fb;
-    --muted:#9c93b5;
-    --card:#15111f;
-    --card-border:#2a2340;
+    --bg-deep:#f8f6fc;
+    --ink:#1c1730;
+    --muted:#786f96;
+    --card:#ffffff;
+    --card-border:#e6e1f2;
     --accent-a:#8b5cf6;
     --accent-b:#c084fc;
-    --danger:#f87171;
+    --danger:#dc2626;
+    --input-bg:#faf9fd;
     --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
     --sans:'Inter','Segoe UI',system-ui,sans-serif;
   }
@@ -23,8 +24,8 @@
     min-height:100vh;
     background-color:var(--bg-deep);
     background-image:
-      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(124,58,237,0.35), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 85% 15%, rgba(139,92,246,0.18), transparent 60%);
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(139,92,246,0.14), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 85% 15%, rgba(192,132,252,0.10), transparent 60%);
     background-repeat:no-repeat;
     color:var(--ink);
     font-family:var(--sans);
@@ -58,24 +59,24 @@
     border:1px solid var(--card-border);
     border-radius:20px;
     padding:28px;
-    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+    box-shadow:0 20px 60px rgba(124,58,237,0.08);
   }
 
   .field{margin-bottom:22px;}
   .field label{display:block;font-size:0.85rem;margin-bottom:10px;color:var(--muted);}
 
   input[type=text]{
-    width:100%;border:1px solid var(--card-border);background:#0f0b18;
+    width:100%;border:1px solid var(--card-border);background:var(--input-bg);
     padding:14px 16px;font-family:inherit;font-size:0.98rem;color:var(--ink);border-radius:12px;
   }
-  input[type=text]::placeholder{color:#5f5678;}
+  input[type=text]::placeholder{color:#b0a8c4;}
   input[type=text]:focus{outline:none;border-color:var(--accent-a);}
 
   .sectors{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
   .sector-card{
     border:1px solid var(--card-border);border-radius:12px;padding:14px 10px;text-align:center;
     cursor:pointer;transition:background .15s,border-color .15s;font-size:0.85rem;color:var(--ink);
-    background:#0f0b18;
+    background:var(--input-bg);
   }
   .sector-card:hover{border-color:var(--accent-a);}
   .sector-card.selected{
@@ -92,7 +93,7 @@
     transition:filter .15s;
   }
   button.primary:hover{filter:brightness(1.1);}
-  button.primary:disabled{background:#3a3450;color:#8a8199;cursor:wait;filter:none;}
+  button.primary:disabled{background:#e6e1f2;color:#a79dbf;cursor:wait;filter:none;}
 
   button.ghost{
     background:transparent;border:1px solid var(--card-border);color:var(--ink);
@@ -121,7 +122,7 @@
   iframe{width:100%;height:70vh;border:1px solid var(--card-border);border-radius:12px;background:#fff;}
   #codeView{
     width:100%;height:70vh;margin:0;padding:16px;border:1px solid var(--card-border);border-radius:12px;
-    background:#0f0b18;color:#d8d2e8;overflow:auto;font-family:var(--mono);font-size:0.8rem;
+    background:var(--input-bg);color:#2a2340;overflow:auto;font-family:var(--mono);font-size:0.8rem;
     white-space:pre-wrap;word-break:break-word;
   }
   #step2{max-width:1100px;margin:0 auto;}
@@ -135,7 +136,7 @@
 
   <section class="step active" id="step1">
     <h1 class="hero-title"><span class="bold">Un site de marque de luxe,</span><br><span class="light">pensé par trois agents IA.</span></h1>
-    <p class="hero-sub">Choisis un secteur, donne le nom de la marque. Direction artistique, développement et relecture s'enchaînent pour livrer une page complète en style Luxe tech.</p>
+    <p class="hero-sub">Direction artistique, développement et relecture s'enchaînent pour livrer une page complète en style Luxe tech.</p>
 
     <div class="card">
       <div class="field">
@@ -175,7 +176,7 @@
 
 <script>
 const SECTORS = [
-  "Horlogerie & montres de luxe",
+  "Horlogerie",
   "Architecture",
   "Centre équestre",
   "Hôtellerie & spa",

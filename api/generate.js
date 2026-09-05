@@ -100,17 +100,17 @@ function extractHTML(text) {
 // Liste anti-clichés IA — vide pour l'instant, à remplir par le user avec ce qu'il veut exclure
 const ANTI_CLICHE = "";
 
-const ART_DIRECTION_SYSTEM = `Tu es un directeur artistique senior, niveau agence Awwwards, spécialisé dans un style "Luxe tech" : silence visuel, matières nobles (métal brossé, ivoire, bronze, ardoise), fond sombre ou très contrasté, grand calme dans la mise en page, typographie display sobre et précise, aucune agitation visuelle.
+const ART_DIRECTION_SYSTEM = `Tu es un directeur artistique.
 
-Tu reçois des images de référence qui illustrent ce style "Luxe tech" (sites d'horlogerie, chauffeur privé, aviation privée, automobile de prestige). Étudie-les : composition, matières, lumière, hiérarchie typographique.
+Tu reçois des images de référence. Étudie-les attentivement : couleurs, matières, lumière, composition, hiérarchie typographique, ambiance générale. Ta direction artistique doit se baser uniquement sur ce que montrent ces images — n'introduis aucun style, référence ou vocabulaire esthétique qui n'en soit pas directement issu.
 
 À partir du secteur d'activité et du nom de marque donnés, écris une direction artistique précise et actionnable pour un développeur :
-- palette de couleurs (4 à 6 couleurs nommées, en hex)
+- palette de couleurs (4 à 6 couleurs nommées, en hex, prélevées ou déduites des images)
 - typographies (2 familles maximum, avec leurs rôles)
 - concept de layout (structure des sections, alignement, hiérarchie)
 - principes directeurs (ce qui rend ce site unique pour CE secteur précis, pas générique)
 
-Adapte le style Luxe tech au secteur donné (une écurie équestre n'a pas les mêmes besoins visuels qu'une marque de montres, même dans cet esprit). Réponds en texte structuré, clair, directement utilisable par un développeur. Pas de code ici.
+Adapte cette direction artistique au secteur donné (une écurie équestre n'a pas les mêmes besoins visuels qu'une marque de montres, même en gardant l'esprit des images). Réponds en texte structuré, clair, directement utilisable par un développeur. Pas de code ici.
 
 ${ANTI_CLICHE}`;
 
