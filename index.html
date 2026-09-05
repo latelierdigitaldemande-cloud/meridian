@@ -195,13 +195,6 @@ document.getElementById('btnGenerate').addEventListener('click', async ()=>{
     document.getElementById('codeView').textContent = data.code;
     document.getElementById('tabPreview').click();
     showStep(2);
-    console.log("Images envoyées à l'agent direction artistique :", data.imageCount);
-    if(data.imageFetchError){
-      console.warn("Problème images Supabase :", data.imageFetchError);
-      document.getElementById('err2').textContent = "⚠️ Images de référence non chargées (" + data.imageFetchError + ") — le site a été généré sans elles.";
-    } else {
-      document.getElementById('err2').textContent = "";
-    }
   }catch(e){
     showError("Ça n'a pas marché : " + e.message);
   }finally{

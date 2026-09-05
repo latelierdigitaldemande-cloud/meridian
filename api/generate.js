@@ -161,24 +161,17 @@ module.exports = async function handler(req, res) {
 
     const briefText = `Secteur d'activité : ${sector}\nNom de la marque : ${brandName}`;
 
-    // 1. Récupérer les images de référence Luxe tech depuis Supabase
-    let imageParts = [];
-    let imageFetchError = null;
-    try {
-      const files = await listBucketFiles();
-      if (files.length === 0) {
-        imageFetchError = "Aucune image trouvée dans le bucket Supabase";
-      }
-      const images = await Promise.all(files.map((f) => fetchImageAsBase64(f.name)));
-      imageParts = images
-        .filter(Boolean)
-        .map((img) => ({ inlineData: { mimeType: img.mimeType, data: img.data } }));
-      if (imageParts.length === 0 && !imageFetchError) {
-        imageFetchError = "Les images n'ont pas pu être téléchargées (0 récupérées)";
-      }
-    } catch (e) {
-      imageFetchError = e.message;
-      imageParts = [];
+    // 1. Récupérer les images de référence Luxe tech depuis Supabase — obligatoire
+    const files = await listBucketFiles();
+    if (files.length === 0) {
+      throw new Error("Aucune image trouvée dans le bucket Supabase — génération bloquée");
+    }
+    const images = await Promise.all(files.map((f) => fetchImageAsBase64(f.name)));
+    const imageParts = images
+      .filter(Boolean)
+      .map((img) => ({ inlineData: { mimeType: img.mimeType, data: img.data } }));
+    if (imageParts.length === 0) {
+      throw new Error("Les images n'ont pas pu être téléchargées depuis Supabase — génération bloquée");
     }
 
     // 2. Agent direction artistique (texte + images de référence)
@@ -195,7 +188,7 @@ module.exports = async function handler(req, res) {
     let finalCode = await callGemini(CRITIQUE_SYSTEM, [{ text: critiqueInput }]);
     finalCode = extractHTML(finalCode);
 
-    res.status(200).json({ code: finalCode || code, imageCount: imageParts.length, imageFetchError });
+    res.status(200).json({ code: finalCode || code, imageCount: imageParts.length });
   } catch (err) {
     res.status(500).json({ error: err.message || "Erreur inconnue" });
   }
