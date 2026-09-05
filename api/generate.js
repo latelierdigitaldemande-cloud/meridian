@@ -3,7 +3,7 @@
 // La clé Gemini est lue depuis les Environment Variables de Vercel (jamais dans ce fichier).
 
 const SUPABASE_URL = "https://muynltisznfgxpuspmku.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_y0bUXswyKp_3bJIJ2XhEAw_8lRCSIMq";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11eW5sdGlzem5mZ3hwdXNwbWt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1NjI4NDUsImV4cCI6MjEwNDEzODg0NX0.3z5xN12sPDeyzP_0gh_hvfnasMojD8Opjs-IPSVPJGo";
 const BUCKET = "meridian-images";
 
 // Modèle Gemini utilisé. Si ce modèle n'est plus disponible sur ton compte,
