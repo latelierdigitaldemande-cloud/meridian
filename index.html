@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian — générateur de sites</title>
+<style>
+  :root{
+    --ink:#161513;
+    --paper:#eeece6;
+    --line:#161513;
+    --accent:#2f4b3c;
+    --accent-soft:#dfe6de;
+    --danger:#7a2e2e;
+    --mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    --serif: 'Georgia', 'Iowan Old Style', serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: var(--serif);
+    line-height:1.5;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:64px 24px 120px;}
+  header{margin-bottom:56px;border-bottom:2px solid var(--line);padding-bottom:24px;}
+  h1{font-size:2.4rem;margin:0 0 8px;font-weight:400;letter-spacing:-0.01em;}
+  header p{margin:0;color:#54524c;font-size:1.05rem;max-width:60ch;}
+
+  .step{display:none;}
+  .step.active{display:block;}
+
+  .field{margin-bottom:28px;}
+  .field label{display:block;font-size:0.95rem;margin-bottom:8px;color:var(--ink);}
+  input[type=text]{
+    width:100%;border:1.5px solid var(--line);background:transparent;
+    padding:14px;font-family:inherit;font-size:1rem;color:var(--ink);border-radius:2px;
+  }
+  input[type=text]:focus{outline:none;border-color:var(--accent);}
+
+  .sectors{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .sector-card{
+    border:1.5px solid var(--line);border-radius:2px;padding:16px;text-align:center;
+    cursor:pointer;transition:background .15s,border-color .15s;font-size:0.95rem;
+  }
+  .sector-card:hover{border-color:var(--accent);}
+  .sector-card.selected{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  @media(max-width:640px){.sectors{grid-template-columns:repeat(2,1fr);}}
+
+  button.primary{
+    background:var(--ink);color:var(--paper);border:none;padding:14px 28px;
+    font-family:inherit;font-size:1rem;cursor:pointer;border-radius:2px;transition:background .15s;
+  }
+  button.primary:hover{background:var(--accent);}
+  button.primary:disabled{background:#a8a49a;cursor:wait;}
+
+  button.ghost{
+    background:transparent;border:1.5px solid var(--line);color:var(--ink);
+    padding:10px 18px;font-family:inherit;font-size:0.92rem;cursor:pointer;border-radius:2px;
+  }
+  button.ghost:hover{background:var(--ink);color:var(--paper);}
+
+  .status{
+    margin:20px 0;font-family:var(--mono);font-size:0.85rem;color:#54524c;
+    display:flex;align-items:center;gap:10px;
+  }
+  .dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+  .error{color:var(--danger);font-family:var(--mono);font-size:0.85rem;margin:16px 0;white-space:pre-wrap;}
+
+  .result-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
+  .tabs{display:flex;gap:8px;margin-bottom:12px;}
+  .tab{
+    background:transparent;border:1.5px solid var(--line);color:var(--ink);
+    padding:8px 16px;font-family:var(--mono);font-size:0.85rem;cursor:pointer;border-radius:2px;
+  }
+  .tab.active{background:var(--ink);color:var(--paper);}
+
+  iframe{width:100%;height:70vh;border:1.5px solid var(--line);border-radius:2px;background:#fff;}
+  #codeView{
+    width:100%;height:70vh;margin:0;padding:16px;border:1.5px solid var(--line);border-radius:2px;
+    background:#fff;overflow:auto;font-family:var(--mono);font-size:0.8rem;white-space:pre-wrap;word-break:break-word;
+  }
+
+  .actions{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;}
+  .stepnum{font-family:var(--mono);font-size:0.8rem;color:#8a877e;margin-bottom:6px;letter-spacing:0.02em;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Meridian</h1>
+    <p>Choisis un secteur, donne le nom de la marque. Trois agents enchaînent direction artistique, développement et relecture avant de te livrer une page complète en style Luxe tech.</p>
+  </header>
+
+  <section class="step active" id="step1">
+    <div class="stepnum">01 — LE BRIEF</div>
+    <div class="field">
+      <label>Secteur d'activité</label>
+      <div class="sectors" id="sectorGrid"></div>
+    </div>
+    <div class="field">
+      <label for="brandName">Nom de la marque</label>
+      <input type="text" id="brandName" placeholder="Ex : REBOURT">
+    </div>
+    <button class="primary" id="btnGenerate">Générer le site</button>
+    <div class="error" id="err1"></div>
+    <div class="status" id="status" style="display:none;">
+      <div class="dot"></div>
+      <span id="statusText">Réflexion en cours…</span>
+    </div>
+  </section>
+
+  <section class="step" id="step2">
+    <div class="stepnum">02 — RÉSULTAT</div>
+    <div class="result-bar">
+      <button class="ghost" id="btnRestart">← Nouveau brief</button>
+      <div class="actions" style="margin:0;">
+        <button class="ghost" id="btnCopy">Copier le code</button>
+        <button class="ghost" id="btnDownload">Télécharger le .html</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="tabPreview">Aperçu</button>
+      <button class="tab" id="tabCode">Code</button>
+    </div>
+    <iframe id="resultFrame"></iframe>
+    <pre id="codeView" style="display:none;"></pre>
+  </section>
+</div>
+
+<script>
+const SECTORS = [
+  "Horlogerie & montres de luxe",
+  "Architecture",
+  "Centre équestre",
+  "Hôtellerie & spa",
+  "Immobilier de prestige",
+  "Yachting & nautisme"
+];
+
+const state = { sector: null, brandName: "", generatedHTML: "" };
+
+function showStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+}
+function setStatus(on, text){
+  const el = document.getElementById('status');
+  el.style.display = on ? 'flex' : 'none';
+  if(text) document.getElementById('statusText').textContent = text;
+}
+function showError(msg){
+  document.getElementById('err1').textContent = msg || "";
+}
+
+const sectorGrid = document.getElementById('sectorGrid');
+SECTORS.forEach(sector=>{
+  const card = document.createElement('div');
+  card.className = "sector-card";
+  card.textContent = sector;
+  card.addEventListener('click', ()=>{
+    document.querySelectorAll('.sector-card').forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.sector = sector;
+  });
+  sectorGrid.appendChild(card);
+});
+
+document.getElementById('btnGenerate').addEventListener('click', async ()=>{
+  showError('');
+  state.brandName = document.getElementById('brandName').value.trim();
+
+  if(!state.sector){ showError("Choisis un secteur avant de continuer."); return; }
+  if(!state.brandName){ showError("Indique le nom de la marque."); return; }
+
+  const btn = document.getElementById('btnGenerate');
+  btn.disabled = true;
+  setStatus(true, "Direction artistique, développement, relecture… (peut prendre 30-60s)");
+
+  try{
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ sector: state.sector, brandName: state.brandName })
+    });
+    const data = await res.json();
+    if(!res.ok){ throw new Error(data.error || "Erreur serveur"); }
+
+    state.generatedHTML = data.code;
+    document.getElementById('resultFrame').srcdoc = data.code;
+    document.getElementById('codeView').textContent = data.code;
+    document.getElementById('tabPreview').click();
+    showStep(2);
+  }catch(e){
+    showError("Ça n'a pas marché : " + e.message);
+  }finally{
+    btn.disabled = false;
+    setStatus(false);
+  }
+});
+
+document.getElementById('tabPreview').addEventListener('click', ()=>{
+  document.getElementById('tabPreview').classList.add('active');
+  document.getElementById('tabCode').classList.remove('active');
+  document.getElementById('resultFrame').style.display = 'block';
+  document.getElementById('codeView').style.display = 'none';
+});
+document.getElementById('tabCode').addEventListener('click', ()=>{
+  document.getElementById('tabCode').classList.add('active');
+  document.getElementById('tabPreview').classList.remove('active');
+  document.getElementById('resultFrame').style.display = 'none';
+  document.getElementById('codeView').style.display = 'block';
+});
+
+document.getElementById('btnCopy').addEventListener('click', ()=>{
+  navigator.clipboard.writeText(state.generatedHTML);
+  const btn = document.getElementById('btnCopy');
+  const old = btn.textContent;
+  btn.textContent = "Copié !";
+  setTimeout(()=> btn.textContent = old, 1500);
+});
+
+document.getElementById('btnDownload').addEventListener('click', ()=>{
+  const blob = new Blob([state.generatedHTML], {type:"text/html"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "site-genere.html";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('btnRestart').addEventListener('click', ()=>{
+  state.sector = null;
+  document.querySelectorAll('.sector-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('brandName').value = "";
+  showError('');
+  showStep(1);
+});
+</script>
+</body>
+</html>
