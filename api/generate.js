@@ -1,5 +1,5 @@
 // api/generate.js
-// Backend Meridian : direction artistique -> développeur -> critique, via l'API Gemini.
+// Backend Meridian : créateur (direction artistique + développement fusionnés) -> critique, via l'API Gemini.
 // La clé Gemini est lue depuis les Environment Variables de Vercel (jamais dans ce fichier).
 
 const SUPABASE_URL = "https://muynltisznfgxpuspmku.supabase.co";
@@ -100,28 +100,17 @@ function extractHTML(text) {
 // Liste anti-clichés IA — vide pour l'instant, à remplir par le user avec ce qu'il veut exclure
 const ANTI_CLICHE = "";
 
-const ART_DIRECTION_SYSTEM = `Tu es un directeur artistique.
+const CREATOR_SYSTEM = `Tu es un directeur artistique et développeur front-end senior spécialisé en sites one-page.
 
-Tu reçois des images de référence. Étudie-les attentivement : couleurs, matières, lumière, composition, hiérarchie typographique, ambiance générale. Ta direction artistique doit se baser uniquement sur ce que montrent ces images — n'introduis aucun style, référence ou vocabulaire esthétique qui n'en soit pas directement issu.
+Tu reçois des images de référence et un brief (secteur, nom de marque). Étudie les images attentivement : couleurs, matières, lumière, composition, hiérarchie typographique, ambiance générale. Ton travail doit se baser uniquement sur ce que montrent ces images — n'introduis aucun style, référence ou vocabulaire esthétique qui n'en soit pas directement issu.
 
-À partir du secteur d'activité et du nom de marque donnés, écris une direction artistique précise et actionnable pour un développeur :
-- palette de couleurs (4 à 6 couleurs nommées, en hex, prélevées ou déduites des images)
-- typographies (2 familles maximum, avec leurs rôles)
-- concept de layout (structure des sections, alignement, hiérarchie)
-- principes directeurs (ce qui rend ce site unique pour CE secteur précis, pas générique)
+À partir du secteur et du nom de marque, détermine toi-même une direction (palette de 4 à 6 couleurs prélevées ou déduites des images, concept de layout, principes qui rendent ce site unique pour CE secteur précis, pas générique), puis écris directement le code du site. Adapte cette direction au secteur donné (une écurie équestre n'a pas les mêmes besoins visuels qu'une marque de montres, même en gardant l'esprit des images).
 
-Adapte cette direction artistique au secteur donné (une écurie équestre n'a pas les mêmes besoins visuels qu'une marque de montres, même en gardant l'esprit des images). Réponds en texte structuré, clair, directement utilisable par un développeur. Pas de code ici.
-
-${ANTI_CLICHE}`;
-
-const DEVELOPER_SYSTEM = `Tu es un développeur front-end senior spécialisé en sites one-page.
-On te donne un brief client (secteur, nom de marque) et une direction artistique déjà validée. Ton travail : écrire le code.
-
-Contraintes strictes :
+Contraintes strictes pour le code :
+- Typographies imposées, à importer via Google Fonts (<link>) : "Libre Caslon Display" pour tous les titres (h1, h2, h3, éléments display), et "Inter" pour tout le texte courant (paragraphes, labels, boutons, navigation). N'utilise aucune autre police, quel que soit le secteur.
 - Un seul fichier HTML autonome (CSS et JS inclus dans le fichier, balises <style> et <script>)
 - Site one-page, responsive (mobile inclus), accessible (focus visible, contrastes corrects)
-- Respecte scrupuleusement la direction artistique fournie (couleurs, typographies, layout, principes)
-- Utilise du vrai contenu rédigé (titres, textes, labels) cohérent avec le secteur et la marque, jamais de texte placeholder
+- Utilise du texte Lorem Ipsum pour tous les contenus rédactionnels (titres, paragraphes, labels), sauf le nom de la marque qui doit rester exact
 - N'ajoute jamais de bandeau cookies, de faux formulaire de paiement, ni de lien vers des pages qui n'existent pas
 
 ${ANTI_CLICHE}
@@ -129,10 +118,11 @@ ${ANTI_CLICHE}
 Réponds UNIQUEMENT avec le code HTML complet, sans explication, sans markdown, en commençant directement par <!DOCTYPE html>.`;
 
 const CRITIQUE_SYSTEM = `Tu es un directeur de création senior qui relit le travail d'un développeur junior avant livraison client.
-On te donne le code HTML d'un site "Luxe tech" ainsi que la direction artistique qu'il devait suivre.
+On te donne le code HTML, le brief (secteur, nom de marque), et les mêmes images de référence que le développeur a utilisées.
 
 Vérifie point par point :
-- Le code respecte-t-il fidèlement la direction artistique (couleurs, typographies, layout) ?
+- Le code utilise-t-il bien et uniquement "Libre Caslon Display" (titres) et "Inter" (texte courant), importées via Google Fonts ?
+- Le code respecte-t-il fidèlement ce que montrent les images de référence (couleurs, layout) ?
 - Le contenu est-il spécifique au secteur et à la marque, sans texte générique ?
 - Le site évite-t-il les clichés de sites générés par IA (voir liste ci-dessous) ?
 - Le HTML est-il valide, responsive, accessible ?
@@ -172,17 +162,13 @@ module.exports = async function handler(req, res) {
       throw new Error("Les images n'ont pas pu être téléchargées depuis Supabase — génération bloquée");
     }
 
-    // 2. Agent direction artistique (texte + images de référence)
-    const artDirectionParts = [...imageParts, { text: briefText }];
-    const artDirection = await callGemini(ART_DIRECTION_SYSTEM, artDirectionParts);
-
-    // 3. Agent développeur (texte + images de référence)
-    const devInput = `${briefText}\n\n--- DIRECTION ARTISTIQUE VALIDÉE ---\n${artDirection}`;
-    let code = await callGemini(DEVELOPER_SYSTEM, [...imageParts, { text: devInput }]);
+    // 2. Agent créateur — direction artistique + développement fusionnés (images + brief -> code)
+    const creatorInput = briefText;
+    let code = await callGemini(CREATOR_SYSTEM, [...imageParts, { text: creatorInput }]);
     code = extractHTML(code);
 
-    // 4. Agent critique (texte + images de référence — relit et corrige si besoin)
-    const critiqueInput = `--- DIRECTION ARTISTIQUE ---\n${artDirection}\n\n--- CODE À RELIRE ---\n${code}`;
+    // 3. Agent critique (images + brief + code -> code final, relit et corrige si besoin)
+    const critiqueInput = `${briefText}\n\n--- CODE À RELIRE ---\n${code}`;
     let finalCode = await callGemini(CRITIQUE_SYSTEM, [...imageParts, { text: critiqueInput }]);
     finalCode = extractHTML(finalCode);
 
