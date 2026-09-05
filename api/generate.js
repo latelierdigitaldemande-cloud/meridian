@@ -119,7 +119,6 @@ On te donne un brief client (secteur, nom de marque) et une direction artistique
 
 Contraintes strictes :
 - Un seul fichier HTML autonome (CSS et JS inclus dans le fichier, balises <style> et <script>)
-- HTML/CSS/JS vanilla uniquement, aucune dépendance externe sauf polices Google Fonts si besoin (via <link>)
 - Site one-page, responsive (mobile inclus), accessible (focus visible, contrastes corrects)
 - Respecte scrupuleusement la direction artistique fournie (couleurs, typographies, layout, principes)
 - Utilise du vrai contenu rédigé (titres, textes, labels) cohérent avec le secteur et la marque, jamais de texte placeholder
