@@ -119,7 +119,9 @@
   }
   .tab.active{background:linear-gradient(135deg,var(--accent-a),var(--accent-b));color:#0a0812;border-color:transparent;}
 
-  iframe{width:100%;height:70vh;border:1px solid var(--card-border);border-radius:12px;background:#fff;}
+  .preview-frame-wrap{width:100%;display:flex;justify-content:center;}
+  iframe{width:100%;height:70vh;border:1px solid var(--card-border);border-radius:12px;background:#fff;transition:width .2s ease;}
+  .preview-frame-wrap.mobile iframe{width:390px;max-width:100%;height:74vh;}
   #codeView{
     width:100%;height:70vh;margin:0;padding:16px;border:1px solid var(--card-border);border-radius:12px;
     background:var(--input-bg);color:#2a2340;overflow:auto;font-family:var(--mono);font-size:0.8rem;
@@ -168,8 +170,13 @@
     <div class="tabs">
       <button class="tab active" id="tabPreview">Aperçu</button>
       <button class="tab" id="tabCode">Code</button>
+      <span style="flex:1;"></span>
+      <button class="tab active" id="viewDesktop">🖥 Desktop</button>
+      <button class="tab" id="viewMobile">📱 Mobile</button>
     </div>
-    <iframe id="resultFrame"></iframe>
+    <div class="preview-frame-wrap" id="frameWrap">
+      <iframe id="resultFrame"></iframe>
+    </div>
     <pre id="codeView" style="display:none;"></pre>
   </section>
 </div>
@@ -248,14 +255,29 @@ document.getElementById('btnGenerate').addEventListener('click', async ()=>{
 document.getElementById('tabPreview').addEventListener('click', ()=>{
   document.getElementById('tabPreview').classList.add('active');
   document.getElementById('tabCode').classList.remove('active');
-  document.getElementById('resultFrame').style.display = 'block';
+  document.getElementById('frameWrap').style.display = 'flex';
   document.getElementById('codeView').style.display = 'none';
+  document.getElementById('viewDesktop').style.display = 'inline-block';
+  document.getElementById('viewMobile').style.display = 'inline-block';
 });
 document.getElementById('tabCode').addEventListener('click', ()=>{
   document.getElementById('tabCode').classList.add('active');
   document.getElementById('tabPreview').classList.remove('active');
-  document.getElementById('resultFrame').style.display = 'none';
+  document.getElementById('frameWrap').style.display = 'none';
   document.getElementById('codeView').style.display = 'block';
+  document.getElementById('viewDesktop').style.display = 'none';
+  document.getElementById('viewMobile').style.display = 'none';
+});
+
+document.getElementById('viewDesktop').addEventListener('click', ()=>{
+  document.getElementById('viewDesktop').classList.add('active');
+  document.getElementById('viewMobile').classList.remove('active');
+  document.getElementById('frameWrap').classList.remove('mobile');
+});
+document.getElementById('viewMobile').addEventListener('click', ()=>{
+  document.getElementById('viewMobile').classList.add('active');
+  document.getElementById('viewDesktop').classList.remove('active');
+  document.getElementById('frameWrap').classList.add('mobile');
 });
 
 document.getElementById('btnCopy').addEventListener('click', ()=>{
