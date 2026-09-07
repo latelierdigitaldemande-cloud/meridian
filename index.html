@@ -2,114 +2,118 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Meridian — générateur de sites</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-deep:#f8f6fc;
-    --ink:#1c1730;
-    --muted:#786f96;
-    --card:#ffffff;
-    --card-border:#e6e1f2;
-    --accent-a:#8b5cf6;
-    --accent-b:#c084fc;
-    --danger:#dc2626;
-    --input-bg:#faf9fd;
+    --bg:#0a0a0b;
+    --ink:#f5f5f7;
+    --muted:#8b8b92;
+    --card:#17171a;
+    --card-border:rgba(255,255,255,0.08);
+    --input-bg:#1f1f23;
+    --accent:#3b82f6;
+    --accent-2:#60a5fa;
+    --danger:#f87171;
     --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
-    --sans:'Inter','Segoe UI',system-ui,sans-serif;
+    --sans:'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif;
   }
   *{box-sizing:border-box;}
+  html,body{height:100%;}
   body{
     margin:0;
-    min-height:100vh;
-    background-color:var(--bg-deep);
-    background-image:
-      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(139,92,246,0.14), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 85% 15%, rgba(192,132,252,0.10), transparent 60%);
-    background-repeat:no-repeat;
+    background:var(--bg);
     color:var(--ink);
     font-family:var(--sans);
-    line-height:1.5;
+    line-height:1.4;
+    overscroll-behavior:none;
   }
-  .wrap{max-width:760px;margin:0 auto;padding:56px 24px 120px;}
 
-  nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:100px;}
-  .wordmark{font-weight:700;font-size:1.05rem;letter-spacing:-0.01em;}
-
+  /* ---- étape 1 : accueil, verrouillée sur la hauteur d'écran, pas de scroll ---- */
+  #step1{
+    height:100dvh;
+    display:flex;
+    flex-direction:column;
+    padding:20px 20px calc(20px + env(safe-area-inset-bottom));
+    overflow:hidden;
+  }
   .step{display:none;}
-  .step.active{display:block;}
+  .step.active{display:flex;flex-direction:column;}
 
+  nav{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .logo-mark{
+    width:34px;height:34px;border-radius:10px;flex-shrink:0;
+    background:radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent) 60%, #1d4ed8 100%);
+    box-shadow:0 0 18px rgba(59,130,246,0.55);
+  }
+  .wordmark{font-weight:800;font-size:1.15rem;letter-spacing:-0.01em;}
+  .menu-btn{
+    width:40px;height:40px;border-radius:50%;border:1px solid var(--card-border);
+    background:var(--card);color:var(--ink);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+  }
+
+  .hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:0;}
   .hero-title{
-    text-align:center;
-    font-size:clamp(2.2rem,5.5vw,3.6rem);
-    line-height:1.12;
+    font-weight:800;
+    font-size:clamp(1.9rem,8vw,2.6rem);
+    line-height:1.08;
     letter-spacing:-0.02em;
-    margin:0 0 20px;
+    margin:0 0 14px;
   }
-  .hero-title .light{font-weight:400;color:var(--muted);}
-  .hero-title .bold{font-weight:800;color:var(--ink);}
+  .hero-sub{color:var(--muted);font-size:0.95rem;max-width:34ch;margin:0 auto;}
 
-  .hero-sub{
-    text-align:center;color:var(--muted);font-size:1.02rem;
-    max-width:52ch;margin:0 auto 48px;
-  }
-
-  .card{
+  .promptCard{
+    flex-shrink:0;
     background:var(--card);
     border:1px solid var(--card-border);
-    border-radius:20px;
-    padding:28px;
-    box-shadow:0 20px 60px rgba(124,58,237,0.08);
+    border-radius:22px;
+    padding:14px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.4);
+  }
+  .promptCard textarea{
+    width:100%;border:none;background:transparent;resize:none;
+    font-family:inherit;font-size:1rem;color:var(--ink);padding:6px 6px 12px;
+    height:56px;outline:none;
+  }
+  .promptCard textarea::placeholder{color:#6b6b72;}
+
+  .promptRow{display:flex;align-items:center;gap:8px;}
+  .sectorPillWrap{position:relative;flex:1;min-width:0;}
+  select.sectorPill{
+    width:100%;appearance:none;-webkit-appearance:none;
+    background:var(--input-bg);color:var(--ink);border:1px solid var(--card-border);
+    border-radius:999px;padding:10px 30px 10px 16px;font-family:inherit;font-size:0.85rem;
+    cursor:pointer;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .sectorPillWrap::after{
+    content:"⌄";position:absolute;right:14px;top:50%;transform:translateY(-55%);
+    color:var(--muted);pointer-events:none;font-size:0.9rem;
   }
 
-  .field{margin-bottom:22px;}
-  .field label{display:block;font-size:0.85rem;margin-bottom:10px;color:var(--muted);}
-
-  input[type=text]{
-    width:100%;border:1px solid var(--card-border);background:var(--input-bg);
-    padding:14px 16px;font-family:inherit;font-size:0.98rem;color:var(--ink);border-radius:12px;
-  }
-  input[type=text]::placeholder{color:#b0a8c4;}
-  input[type=text]:focus{outline:none;border-color:var(--accent-a);}
-
-  .sectors{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-  .sector-card{
-    border:1px solid var(--card-border);border-radius:12px;padding:14px 10px;text-align:center;
-    cursor:pointer;transition:background .15s,border-color .15s;font-size:0.85rem;color:var(--ink);
-    background:var(--input-bg);
-  }
-  .sector-card:hover{border-color:var(--accent-a);}
-  .sector-card.selected{
-    background:linear-gradient(135deg,var(--accent-a),var(--accent-b));
-    border-color:transparent;color:#0a0812;font-weight:600;
-  }
-  @media(max-width:560px){.sectors{grid-template-columns:repeat(2,1fr);}}
-
-  button.primary{
-    width:100%;
-    background:linear-gradient(135deg,var(--accent-a),var(--accent-b));
-    color:#0a0812;border:none;padding:16px 28px;font-weight:700;
-    font-family:inherit;font-size:1rem;cursor:pointer;border-radius:12px;
+  button.submit-circle{
+    width:42px;height:42px;border-radius:50%;flex-shrink:0;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#0a0a0b;
+    display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;
     transition:filter .15s;
   }
-  button.primary:hover{filter:brightness(1.1);}
-  button.primary:disabled{background:#e6e1f2;color:#a79dbf;cursor:wait;filter:none;}
+  button.submit-circle:hover{filter:brightness(1.1);}
+  button.submit-circle:disabled{background:#3a3a3f;color:#7a7a80;cursor:wait;filter:none;}
 
-  button.ghost{
-    background:transparent;border:1px solid var(--card-border);color:var(--ink);
-    padding:10px 18px;font-family:inherit;font-size:0.88rem;cursor:pointer;border-radius:10px;
-  }
-  button.ghost:hover{border-color:var(--accent-a);}
-
+  .error{color:var(--danger);font-family:var(--mono);font-size:0.75rem;margin-top:10px;white-space:pre-wrap;text-align:center;flex-shrink:0;}
   .status{
-    margin-top:18px;font-family:var(--mono);font-size:0.82rem;color:var(--muted);
-    display:flex;align-items:center;justify-content:center;gap:10px;
+    margin-top:10px;font-family:var(--mono);font-size:0.75rem;color:var(--muted);
+    display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;
   }
-  .dot{width:7px;height:7px;background:var(--accent-b);border-radius:50%;animation:pulse 1.2s infinite;}
+  .dot{width:6px;height:6px;background:var(--accent-2);border-radius:50%;animation:pulse 1.2s infinite;}
   @keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
 
-  .error{color:var(--danger);font-family:var(--mono);font-size:0.82rem;margin-top:16px;white-space:pre-wrap;text-align:center;}
-
+  /* ---- étape 2 : résultat ---- */
+  #step2{max-width:1100px;margin:0 auto;padding:24px 20px 60px;min-height:100vh;}
   .result-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
   .actions{display:flex;gap:10px;flex-wrap:wrap;}
   .tabs{display:flex;gap:8px;margin-bottom:12px;}
@@ -117,69 +121,75 @@
     background:transparent;border:1px solid var(--card-border);color:var(--ink);
     padding:8px 16px;font-family:var(--mono);font-size:0.82rem;cursor:pointer;border-radius:8px;
   }
-  .tab.active{background:linear-gradient(135deg,var(--accent-a),var(--accent-b));color:#0a0812;border-color:transparent;}
+  .tab.active{background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#0a0a0b;border-color:transparent;}
+
+  button.ghost{
+    background:transparent;border:1px solid var(--card-border);color:var(--ink);
+    padding:10px 18px;font-family:inherit;font-size:0.88rem;cursor:pointer;border-radius:10px;
+  }
+  button.ghost:hover{border-color:var(--accent);}
 
   .preview-frame-wrap{width:100%;display:flex;justify-content:center;}
-  iframe{width:100%;height:70vh;border:1px solid var(--card-border);border-radius:12px;background:#fff;transition:width .2s ease;}
-  .preview-frame-wrap.mobile iframe{width:390px;max-width:100%;height:74vh;}
+  iframe{width:390px;max-width:100%;height:74vh;border:1px solid var(--card-border);border-radius:12px;background:#fff;}
   #codeView{
     width:100%;height:70vh;margin:0;padding:16px;border:1px solid var(--card-border);border-radius:12px;
-    background:var(--input-bg);color:#2a2340;overflow:auto;font-family:var(--mono);font-size:0.8rem;
+    background:var(--input-bg);color:var(--ink);overflow:auto;font-family:var(--mono);font-size:0.8rem;
     white-space:pre-wrap;word-break:break-word;
   }
-  #step2{max-width:1100px;margin:0 auto;}
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<section class="step active" id="step1">
   <nav>
-    <span class="wordmark">Meridian</span>
+    <div class="brand">
+      <div class="logo-mark"></div>
+      <span class="wordmark">Meridian</span>
+    </div>
+    <button class="menu-btn" aria-label="Menu">☰</button>
   </nav>
 
-  <section class="step active" id="step1">
-    <h1 class="hero-title"><span class="bold">Un site de marque de luxe,</span><br><span class="light">pensé par trois agents IA.</span></h1>
-    <p class="hero-sub">Direction artistique, développement et relecture s'enchaînent pour livrer une page complète en style Luxe tech.</p>
+  <div class="hero">
+    <h1 class="hero-title">Un site de luxe,<br>généré par l'IA.</h1>
+    <p class="hero-sub">Décris ta marque et son secteur, obtiens une page complète en quelques instants.</p>
+  </div>
 
-    <div class="card">
-      <div class="field">
-        <label>Secteur d'activité</label>
-        <div class="sectors" id="sectorGrid"></div>
+  <div class="promptCard">
+    <textarea id="brandName" placeholder="Nom de la marque, ex : REBOURT"></textarea>
+    <div class="promptRow">
+      <div class="sectorPillWrap">
+        <select class="sectorPill" id="sectorSelect">
+          <option value="" disabled selected>Secteur d'activité</option>
+        </select>
       </div>
-      <div class="field">
-        <label for="brandName">Nom de la marque</label>
-        <input type="text" id="brandName" placeholder="Ex : REBOURT">
-      </div>
-      <button class="primary" id="btnGenerate">✦ Générer le site</button>
-      <div class="error" id="err1"></div>
-      <div class="status" id="status" style="display:none;">
-        <div class="dot"></div>
-        <span id="statusText">Réflexion en cours…</span>
-      </div>
+      <button class="submit-circle" id="btnGenerate" aria-label="Générer">↑</button>
     </div>
-  </section>
+  </div>
+  <div class="error" id="err1"></div>
+  <div class="status" id="status" style="display:none;">
+    <div class="dot"></div>
+    <span id="statusText">Réflexion en cours…</span>
+  </div>
+</section>
 
-  <section class="step" id="step2">
-    <div class="error" id="err2"></div>
-    <div class="result-bar">
-      <button class="ghost" id="btnRestart">← Nouveau brief</button>
-      <div class="actions">
-        <button class="ghost" id="btnCopy">Copier le code</button>
-        <button class="ghost" id="btnDownload">Télécharger le .html</button>
-      </div>
+<section class="step" id="step2">
+  <div class="error" id="err2"></div>
+  <div class="result-bar">
+    <button class="ghost" id="btnRestart">← Nouveau brief</button>
+    <div class="actions">
+      <button class="ghost" id="btnCopy">Copier le code</button>
+      <button class="ghost" id="btnDownload">Télécharger le .html</button>
     </div>
-    <div class="tabs">
-      <button class="tab active" id="tabPreview">Aperçu</button>
-      <button class="tab" id="tabCode">Code</button>
-      <span style="flex:1;"></span>
-      <button class="tab active" id="viewDesktop">🖥 Desktop</button>
-      <button class="tab" id="viewMobile">📱 Mobile</button>
-    </div>
-    <div class="preview-frame-wrap" id="frameWrap">
-      <iframe id="resultFrame"></iframe>
-    </div>
-    <pre id="codeView" style="display:none;"></pre>
-  </section>
-</div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" id="tabPreview">Aperçu</button>
+    <button class="tab" id="tabCode">Code</button>
+  </div>
+  <div class="preview-frame-wrap" id="frameWrap">
+    <iframe id="resultFrame"></iframe>
+  </div>
+  <pre id="codeView" style="display:none;"></pre>
+</section>
 
 <script>
 const SECTORS = [
@@ -206,25 +216,23 @@ function showError(msg){
   document.getElementById('err1').textContent = msg || "";
 }
 
-const sectorGrid = document.getElementById('sectorGrid');
+const sectorSelect = document.getElementById('sectorSelect');
 SECTORS.forEach(sector=>{
-  const card = document.createElement('div');
-  card.className = "sector-card";
-  card.textContent = sector;
-  card.addEventListener('click', ()=>{
-    document.querySelectorAll('.sector-card').forEach(c=>c.classList.remove('selected'));
-    card.classList.add('selected');
-    state.sector = sector;
-  });
-  sectorGrid.appendChild(card);
+  const opt = document.createElement('option');
+  opt.value = sector;
+  opt.textContent = sector;
+  sectorSelect.appendChild(opt);
+});
+sectorSelect.addEventListener('change', ()=>{
+  state.sector = sectorSelect.value;
 });
 
 document.getElementById('btnGenerate').addEventListener('click', async ()=>{
   showError('');
   state.brandName = document.getElementById('brandName').value.trim();
 
-  if(!state.sector){ showError("Choisis un secteur avant de continuer."); return; }
   if(!state.brandName){ showError("Indique le nom de la marque."); return; }
+  if(!state.sector){ showError("Choisis un secteur avant de continuer."); return; }
 
   const btn = document.getElementById('btnGenerate');
   btn.disabled = true;
@@ -257,27 +265,12 @@ document.getElementById('tabPreview').addEventListener('click', ()=>{
   document.getElementById('tabCode').classList.remove('active');
   document.getElementById('frameWrap').style.display = 'flex';
   document.getElementById('codeView').style.display = 'none';
-  document.getElementById('viewDesktop').style.display = 'inline-block';
-  document.getElementById('viewMobile').style.display = 'inline-block';
 });
 document.getElementById('tabCode').addEventListener('click', ()=>{
   document.getElementById('tabCode').classList.add('active');
   document.getElementById('tabPreview').classList.remove('active');
   document.getElementById('frameWrap').style.display = 'none';
   document.getElementById('codeView').style.display = 'block';
-  document.getElementById('viewDesktop').style.display = 'none';
-  document.getElementById('viewMobile').style.display = 'none';
-});
-
-document.getElementById('viewDesktop').addEventListener('click', ()=>{
-  document.getElementById('viewDesktop').classList.add('active');
-  document.getElementById('viewMobile').classList.remove('active');
-  document.getElementById('frameWrap').classList.remove('mobile');
-});
-document.getElementById('viewMobile').addEventListener('click', ()=>{
-  document.getElementById('viewMobile').classList.add('active');
-  document.getElementById('viewDesktop').classList.remove('active');
-  document.getElementById('frameWrap').classList.add('mobile');
 });
 
 document.getElementById('btnCopy').addEventListener('click', ()=>{
@@ -300,7 +293,7 @@ document.getElementById('btnDownload').addEventListener('click', ()=>{
 
 document.getElementById('btnRestart').addEventListener('click', ()=>{
   state.sector = null;
-  document.querySelectorAll('.sector-card').forEach(c=>c.classList.remove('selected'));
+  sectorSelect.selectedIndex = 0;
   document.getElementById('brandName').value = "";
   showError('');
   showStep(1);

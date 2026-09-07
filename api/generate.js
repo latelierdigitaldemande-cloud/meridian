@@ -23,7 +23,7 @@ function extensionOf(filename) {
   return parts[parts.length - 1].toLowerCase();
 }
 
-// Récupère la liste des fichiers du bucket Supabase
+// Récupère la liste des fichiers du bucket Supabase (remplace les images du bucket toi-même — pas de nombre fixe codé en dur)
 async function listBucketFiles() {
   const res = await fetch(
     `${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`,
@@ -167,7 +167,7 @@ module.exports = async function handler(req, res) {
 
     const briefText = `Secteur d'activité : ${sector}\nNom de la marque : ${brandName}`;
 
-    // 1. Récupérer les images de référence Luxe tech depuis Supabase — obligatoire
+    // 1. Récupérer les images de référence depuis Supabase — obligatoire
     const files = await listBucketFiles();
     if (files.length === 0) {
       throw new Error("Aucune image trouvée dans le bucket Supabase — génération bloquée");
